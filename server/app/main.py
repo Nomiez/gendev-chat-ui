@@ -1,9 +1,7 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
 
-from app.models.users import User
-from app.utils.db import get_db, engine
-from app.repositories.user_repository import user_repository
+from app.routes import user_route, token_route, review_route
+from app.utils.db import engine
 
 from app.models import (
     conversations,
@@ -25,7 +23,6 @@ users.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-
-@app.get("/user")
-async def get_user():
-    return user_repository.get_user_from_username("Test")
+app.include_router(user_route.router)
+app.include_router(token_route.router)
+app.include_router(review_route.router)

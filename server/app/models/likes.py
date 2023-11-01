@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Boolean, Integer, String, TIMESTAMP, text, ForeignKey
+from sqlalchemy import Column, Boolean, Integer, String, TIMESTAMP, text, ForeignKey, UniqueConstraint
 
 from app.utils.db import Base
 
@@ -11,3 +11,5 @@ class Like(Base):
     review_id = Column(Integer, ForeignKey('reviews.review_id', ondelete='CASCADE'), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+
+    __table_args__ = (UniqueConstraint('user_id', 'review_id', name='_user_review_uc'), )
