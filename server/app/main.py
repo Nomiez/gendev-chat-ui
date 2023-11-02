@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.routes import user_route, token_route, review_route
+from app.routes import user_route, token_route, review_route, conversation_route
 from app.utils.db import engine
 
 from app.models import (
@@ -26,3 +26,4 @@ app = FastAPI()
 app.include_router(user_route.router)
 app.include_router(token_route.router)
 app.include_router(review_route.router)
+app.include_router(conversation_route.router)

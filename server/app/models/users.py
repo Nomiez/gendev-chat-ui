@@ -29,3 +29,7 @@ class User(MyBase):
     likes = relationship("Review", secondary="likes", back_populates="likes")
     written_reviews = relationship("Review", back_populates="users", foreign_keys="Review.author_id")
     others_reviews = relationship("Review", back_populates="users", foreign_keys="Review.user_id")
+    conversations_as_customer = relationship("Conversation", back_populates="customer",
+                                             foreign_keys="Conversation.customer_id")
+    conversations_as_service_provider = relationship("Conversation", back_populates="service_provider",
+                                                     foreign_keys="Conversation.service_provider_id")
