@@ -22,7 +22,7 @@ router = APIRouter(
 async def get_conversations_pag(user: UserSchema | None = Depends(auth_service.get_current_user), page: int = Query(1),
                                 size: int = Query(12)):
     is_valid_user(user)
-    return get_conversations_from_user_by_id_pag(user.user_id, page, size)
+    return get_conversations_from_user_by_id_pag(user.user_id, page, size, True)
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=ConversationGet)
