@@ -44,6 +44,7 @@ def save_profile_picture(user: UserSchema, file: UploadFile) -> UserSchema:
         if user.profile_picture != "default.png":
             os.remove(f"media/profile_pictures/{user.profile_picture}")
 
+        os.makedirs(os.path.dirname(f"media/profile_pictures/"), exist_ok=True)
         with open(f"media/profile_pictures/{new_filename}", "xb") as f:
             f.write(contents)
             user.profile_picture = new_filename

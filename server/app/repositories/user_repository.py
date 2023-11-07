@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from pydantic import EmailStr
@@ -22,6 +23,7 @@ class UserRepository:
 
     def get_user_from_username(self, email: EmailStr) -> UserSchema:
         user = self.db.query(users.User).filter(users.User.email == email).first()
+        # TODO Catch if user is None
         keyword_list = user.keywords
         if not user:
             raise Exception(f"User with username ${email} not found")
@@ -37,7 +39,8 @@ class UserRepository:
             .limit(size) \
             .all()
 
-        return [UserSchema(**{**user.to_dict(), "keywords": [keyword.keyword for keyword in user.keywords]}) for user in user_list]
+        return [UserSchema(**{**user.to_dict(), "keywords": [keyword.keyword for keyword in user.keywords]}) for user in
+                user_list]
 
     def save_user(self, user: UserPostExtended) -> UserSchema:
         new_user = user.model_dump()
@@ -65,6 +68,7 @@ class UserRepository:
         user_dict = old_user.model_dump()
         user_dict.pop('keywords')
         new_user = users.User(**user_dict)
+        new_user.updated_at = datetime.now()
         for keyword in user.keywords:
             new_user.keywords.append(keywords.Keyword(keyword=keyword))
         self.db.query(users.User).filter(users.User.user_id == user_id).update(new_user.to_dict())

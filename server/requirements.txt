@@ -9,3 +9,8 @@ SQLAlchemy==2.0.22
 starlette==0.31.1
 passlib[bcrypt]==1.7.4
 psycopg2-binary
+phonenumbers~=8.13.24
+asyncio~=3.4.3
+emoji~=2.8.0
+PyYAML~=6.0.1
+uvicorn~=0.15.0

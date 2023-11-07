@@ -13,14 +13,20 @@ from app.services.auth_service import is_valid_user
 from app.utils.parser_utils import parse_list
 
 router = APIRouter(
-    prefix="/users",
+    prefix="/user",
     tags=['Users']
 )
 
 
+@router.get("/me", response_model=UserGet)
+async def get_current_user(user: UserSchema | None = Depends(auth_service.get_current_user)):
+    is_valid_user(user)
+    return user
+
+
 @router.get("/{id}/image/", responses={200: {"content": {"image/png": {}}}}, response_class=FileResponse)
 def get_image(id: int):
-    print(f"media/profile_pictures/{user_service.get_user_by_id(int(id)).profile_picture}")
+
     return FileResponse(path=f"media/profile_pictures/{user_service.get_user_by_id(int(id)).profile_picture}")
 
 
@@ -33,7 +39,8 @@ async def get_user_by_id(id: int, user: UserSchema | None = Depends(auth_service
 
 
 @router.get("/", response_model=list[UserGetFiltered])
-async def get_user_by_keywords_paginated(keywords: list[str] = Depends(parse_list), page: int = Query(1), size: int = Query(5)):
+async def get_user_by_keywords_paginated(keywords: list[str] = Depends(parse_list), page: int = Query(1),
+                                         size: int = Query(5)):
     if len(keywords) == 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Keyword-List cannot be empty")
     return user_service.get_user_by_keyword_pag(keywords, page, size)

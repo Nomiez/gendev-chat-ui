@@ -6,10 +6,15 @@ from sqlalchemy.orm import relationship
 from app.utils.db import Base
 
 
-class State(EnumBase):
-    QUOTED = "quoted"
+class StateReduced(EnumBase):
     ACCEPTED = "accepted"
     REJECTED = "rejected"
+
+
+class State(EnumBase):
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    QUOTED = "quoted"
 
 
 class MyBase(Base):
@@ -29,7 +34,8 @@ class Conversation(MyBase):
     service_provider = relationship("User", back_populates="conversations_as_service_provider",
                                     foreign_keys="Conversation.service_provider_id")
     state = Column(Enum(State), nullable=False, default=State.QUOTED)
-
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     deleted_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    messages = relationship("ConversationMessage", back_populates="conversation",
+                            foreign_keys="ConversationMessage.conversation_id")
