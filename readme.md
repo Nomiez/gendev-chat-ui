@@ -53,6 +53,9 @@ Frontend: React.js (Vite) for a responsive and dynamic UI.
 
 ✅ Paginated Chat view
 
+(📚) On Database Level: Support for Thread Messages
+
+### Explanation
 ✅ Implemented in Client and Server
 
 📚 Only implemented in Client
