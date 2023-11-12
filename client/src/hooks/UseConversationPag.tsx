@@ -13,7 +13,8 @@ function UseConversationPag(sizeProp: number) {
         conversations,
         setConversations,
         conversationApi,
-        setSelectedConversation
+        setSelectedConversation,
+        selectedConversation
     } = useContext(context);
 
     // Fetch conversations every 1 seconds
@@ -23,7 +24,9 @@ function UseConversationPag(sizeProp: number) {
             const response = await conversationApi.getConversationsPagConversationGet(page, size);
             if (response.status === 200) {
                 setConversations(response.data);
-                setSelectedConversation(response.data.filter((conversation) => conversation.conversation_id === conversations[0].conversation_id)[0]);
+                if (selectedConversation) {
+                    setSelectedConversation(response.data.filter((conversation) => conversation.conversation_id === selectedConversation.conversation_id)[0]);
+                }
             }
         }, 1000);
         return () => clearInterval(interval);

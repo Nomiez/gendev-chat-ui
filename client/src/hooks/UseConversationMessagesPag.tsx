@@ -3,7 +3,7 @@ import context from "../utils/Context.tsx";
 import {useState} from "react";
 import {ConversationMessage} from "../api";
 
-function UseConversationPag(sizeProp: number) {
+function UseConversationMessagePag(sizeProp: number) {
 
 
     const [page, setPage] = useState<number>(1);
@@ -13,7 +13,7 @@ function UseConversationPag(sizeProp: number) {
 
     const {
         selectedConversation,
-        messageApi,
+        messageApi
     } = useContext(context);
 
 
@@ -24,16 +24,15 @@ function UseConversationPag(sizeProp: number) {
             if (selectedConversation !== null) {
                 const response = await messageApi.getConversationMessagePagConversationConversationIdMessageGet(selectedConversation.conversation_id, page, size);
                 if (response.status === 200) {
-                    if (response.data[0].message_id !== messages[0].message_id) {
+                    if (messages && messages.length > 0 && response.data[0].message_id !== messages[0].message_id) {
                         setMessages(response.data);
                     }
                 }
             }
-            console.log("fetching messages")
         }, 1000);
         return () => clearInterval(interval);
 
-    }, [messageApi, selectedConversation])
+    }, [messageApi, selectedConversation, messages])
 
 
     useEffect(() => {
@@ -105,4 +104,4 @@ function UseConversationPag(sizeProp: number) {
     };
 }
 
-export default UseConversationPag;
+export default UseConversationMessagePag;
