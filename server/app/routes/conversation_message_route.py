@@ -12,12 +12,12 @@ from app.schemas.user_schema import UserSchema
 from app.services import auth_service
 from app.services.auth_service import is_valid_user
 from app.services.conversation_message_service import get_messages_by_conversation_id_pag, create_new_message, \
-    accept_quote, update_message_reactions, get_message_by_message_id
+    accept_quote, update_message_reactions, get_message_by_message_id, reject_quote
 from app.schemas.message_schema import ConversationMessage, ConversationMessagePost
 
 router = APIRouter(
     prefix="/conversation",
-    tags=['Messages']
+    tags=['Message']
 )
 
 
@@ -27,7 +27,8 @@ async def get_conversation_message_pag(conversation_id: int,
                                        page: int = Query(1),
                                        size: int = Query(12)):
     is_valid_user(user)
-    return get_messages_by_conversation_id_pag(conversation_id, user.user_id, page, size)
+    conversations = get_messages_by_conversation_id_pag(conversation_id, user.user_id, page, size)
+    return conversations
 
 
 @router.post("/{conversation_id}/message/", status_code=status.HTTP_201_CREATED, response_model=ConversationMessage)
@@ -70,11 +71,10 @@ def post_conversation_message_and_quote_change(
         user: UserSchema | None = Depends(auth_service.get_current_user)):
     is_valid_user(user)
 
-    if quote == State.ACCEPTED:
+    if quote.value == State.ACCEPTED.value:
         accept_quote(conversation_id, user.user_id)
-    if quote == State.REJECTED:
-        accept_quote(conversation_id, user.user_id)
-    return create_new_message(conversation_id, user.user_id, ConversationMessagePost(text=text, hidden_at=None))
+    if quote.value == State.REJECTED.value:
+        reject_quote(conversation_id, user.user_id)
 
 
 @router.post("/{conversation_id}/message/{message_id}/reaction", status_code=status.HTTP_201_CREATED,

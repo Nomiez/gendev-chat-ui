@@ -14,7 +14,7 @@ from app.utils.parser_utils import parse_list
 
 router = APIRouter(
     prefix="/user",
-    tags=['Users']
+    tags=['User']
 )
 
 
@@ -26,7 +26,6 @@ async def get_current_user(user: UserSchema | None = Depends(auth_service.get_cu
 
 @router.get("/{id}/image/", responses={200: {"content": {"image/png": {}}}}, response_class=FileResponse)
 def get_image(id: int):
-
     return FileResponse(path=f"media/profile_pictures/{user_service.get_user_by_id(int(id)).profile_picture}")
 
 

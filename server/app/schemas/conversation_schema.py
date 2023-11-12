@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from app.models.conversations import State
 from app.schemas.message_schema import ConversationMessage
+from app.schemas.user_schema import UserInReview
 
 
 class ConversationGet(BaseModel):
@@ -13,6 +14,9 @@ class ConversationGet(BaseModel):
     service_provider_id: int
     state: State
     last_message: Optional[ConversationMessage]
+    customer: UserInReview
+    service_provider: UserInReview
+    unread_messages: int
 
 
 class ConversationSchema(BaseModel):
@@ -23,9 +27,10 @@ class ConversationSchema(BaseModel):
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime]
+    customer: UserInReview
+    service_provider: UserInReview
 
 
 class ConversationPost(BaseModel):
     customer_id: int
     service_provider_id: int
-

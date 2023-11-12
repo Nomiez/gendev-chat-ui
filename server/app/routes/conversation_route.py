@@ -31,7 +31,7 @@ async def post_conversation(conversation: ConversationPost,
     is_valid_user(user)
     if conversation.customer_id != user.user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized to create this resource")
-    return create_conversation(conversation)
+    return create_conversation(conversation, user.user_id)
 
 
 @router.delete("/{conversation_id}", status_code=status.HTTP_204_NO_CONTENT)

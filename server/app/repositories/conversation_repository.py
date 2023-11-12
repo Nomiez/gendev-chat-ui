@@ -16,7 +16,9 @@ class ConversationRepository:
         conversation = self.db.query(Conversation).filter(Conversation.conversation_id == conversation_id).first()
         if not conversation:
             return None
-        return ConversationSchema(**conversation.to_dict())
+        return ConversationSchema(**conversation.to_dict(),
+                                  customer=conversation.customer,
+                                  service_provider=conversation.service_provider)
 
     def get_conversations_by_user_id_pag(self, user_id: int, page: int, size: int) -> list[ConversationGet]:
         conversation_list = self.db.query(Conversation) \
@@ -32,16 +34,26 @@ class ConversationRepository:
                 conversation.conversation_id, 1, 1)
             last_message_list.append(None if conversation_msg_list == [] else conversation_msg_list[0])
 
-        return [ConversationGet(**conversation.to_dict(), last_message=last_msg) for conversation, last_msg in
+        return [ConversationGet(**conversation.to_dict(),
+                                customer=conversation.customer,
+                                service_provider=conversation.service_provider,
+                                last_message=last_msg,
+                                unread_messages=conversation_message_repository.get_number_of_unread_messages(
+                                    conversation.conversation_id, user_id)) for conversation, last_msg in
                 zip(conversation_list, last_message_list)]
 
-    def create_conversation(self, conversation: ConversationPost) -> ConversationGet:
+    def create_conversation(self, conversation: ConversationPost, user_id: int) -> ConversationGet:
         new_conversation = Conversation(customer_id=conversation.customer_id,
                                         service_provider_id=conversation.service_provider_id)
         self.db.add(new_conversation)
         self.db.commit()
         self.db.refresh(new_conversation)
-        return ConversationGet(**new_conversation.to_dict(), last_message=None)
+        return ConversationGet(**new_conversation.to_dict(),
+                               customer=new_conversation.customer,
+                               service_provider=new_conversation.service_provider,
+                               last_message=None,
+                               unread_messages=conversation_message_repository.get_number_of_unread_messages(
+                                   conversation.conversation_id, user_id))
 
     def delete_conversation(self, conversation_id: int) -> None:
         conversation = self.db.query(Conversation).filter(Conversation.conversation_id == conversation_id).first()
@@ -49,12 +61,29 @@ class ConversationRepository:
         self.db.commit()
         self.db.refresh(conversation)
 
-    def update_state_of_conversation(self, conversation_id: int, state: State) -> ConversationGet:
+    def update_state_of_conversation(self, conversation_id: int, user_id: int, state: State) -> ConversationGet:
         conversation = self.db.query(Conversation).filter(Conversation.conversation_id == conversation_id).first()
         conversation.state = state
+        self.db.query(Conversation).filter(Conversation.conversation_id == conversation_id).update(
+            conversation.to_dict())
         self.db.commit()
         self.db.refresh(conversation)
-        return ConversationGet(**conversation.to_dict())
+        conversation_msg_list = conversation_message_repository.get_messages_by_conversation_id_pag(
+            conversation.conversation_id, 1, 1)
+        return ConversationGet(**conversation.to_dict(),
+                               customer=conversation.customer,
+                               service_provider=conversation.service_provider,
+                               last_message=conversation_msg_list[0] if conversation_msg_list else None,
+                               unread_messages=conversation_message_repository.get_number_of_unread_messages(
+                                   conversation.conversation_id, user_id)
+                               )
+
+    def update_last_update_of_conversation(self, conversation_id: int, ) -> None:
+        conversation = self.db.query(Conversation).filter(Conversation.conversation_id == conversation_id).first()
+        conversation.updated_at = datetime.now()
+        self.db.query(Conversation).filter(Conversation.conversation_id == conversation_id).update(
+            conversation.to_dict())
+        self.db.commit()
 
 
 conversation_repository = ConversationRepository()

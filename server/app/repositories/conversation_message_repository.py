@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from app.models.conversation_messages import SenderType
+from app.models.conversations import Conversation
 from app.schemas.message_schema import ConversationMessage, ConversationMessagePut, ReadingState
 from app.utils.db import get_db
 from app.models import conversation_messages
@@ -48,20 +50,43 @@ class ConversationMessageRepository:
         return self.get_message_by_id(message_id)
 
     def update_reading_state_for_conversation(self, conversation_id: int, user_id: int, state: ReadingState):
+
+        # TODO: Give conversation directly via params
+        conversation = self.db.query(Conversation).filter(
+            Conversation.conversation_id == conversation_id).first()
+        if conversation.customer_id == user_id:
+            sender_type = SenderType.SERVICE_PROVIDER
+        else:
+            sender_type = SenderType.CUSTOMER
+
         if state == ReadingState.RECEIVED:
             self.db.query(conversation_messages.ConversationMessage) \
                 .filter(conversation_messages.ConversationMessage.conversation_id == conversation_id) \
-                .filter(conversation_messages.ConversationMessage.sender_id == user_id) \
+                .filter(conversation_messages.ConversationMessage.sender_type == sender_type) \
                 .filter(conversation_messages.ConversationMessage.received_at == None) \
                 .update({conversation_messages.ConversationMessage.received_at: datetime.now()})
         elif state == ReadingState.READ:
             self.db.query(conversation_messages.ConversationMessage) \
                 .filter(conversation_messages.ConversationMessage.conversation_id == conversation_id) \
-                .filter(conversation_messages.ConversationMessage.sender_id == user_id) \
+                .filter(conversation_messages.ConversationMessage.sender_type == sender_type) \
                 .filter(conversation_messages.ConversationMessage.read_at == None) \
                 .update({conversation_messages.ConversationMessage.read_at: datetime.now()})
 
         self.db.commit()
+
+    def get_number_of_unread_messages(self, conversation_id: int, user_id: int) -> int:
+        conversation = self.db.query(Conversation).filter(
+            Conversation.conversation_id == conversation_id).first()
+        if conversation.customer_id == user_id:
+            sender_type = SenderType.SERVICE_PROVIDER
+        else:
+            sender_type = SenderType.CUSTOMER
+
+        return self.db.query(conversation_messages.ConversationMessage) \
+            .filter(conversation_messages.ConversationMessage.conversation_id == conversation_id) \
+            .filter(conversation_messages.ConversationMessage.sender_type == sender_type) \
+            .filter(conversation_messages.ConversationMessage.read_at == None) \
+            .count()
 
 
 conversation_message_repository = ConversationMessageRepository()

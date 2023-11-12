@@ -30,6 +30,7 @@ def get_conversation_by_id(conversation_id: int, user_id: Optional[int] = None,
     _update_conversation_reading_state(current_conv, user_id)
     if censored:
         el = MessageStream([current_conv.last_message]) \
+            .filter(lambda msg: msg is not None) \
             .filter(MessageStream.hidden_filter(current_conv, user_id)) \
             .map(MessageStream.censor_func(current_conv)) \
             .to_list()
@@ -46,6 +47,7 @@ def get_conversations_from_user_by_id_pag(user_id: int, page: int, size: int, ce
     if censored:
         for current_conv in conversation_list:
             el = MessageStream([current_conv.last_message]) \
+                .filter(lambda msg: msg is not None) \
                 .filter(MessageStream.hidden_filter(current_conv, user_id)) \
                 .map(MessageStream.censor_func(current_conv)) \
                 .to_list()
@@ -56,12 +58,13 @@ def get_conversations_from_user_by_id_pag(user_id: int, page: int, size: int, ce
     return conversation_list
 
 
-def create_conversation(conversation: ConversationPost) -> ConversationGet:
+def create_conversation(conversation: ConversationPost, user_id: int) -> ConversationGet:
     if conversation.customer_id == conversation.service_provider_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Customer and service provider must be different")
-    return conversation_repository.create_conversation(conversation)
+    return conversation_repository.create_conversation(conversation, user_id)
 
 
 def delete_conversation(conversation_id: int) -> None:
-    return conversation_repository.delete_conversation(conversation_id)
+    conversation_repository.delete_conversation(conversation_id)
+    conversation_repository.update_last_update_of_conversation(conversation_id)
