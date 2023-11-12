@@ -94,9 +94,9 @@ yarn run dev
 ```
 
 ## Demo
-Short drafts and a demo video can be found under my (nextcloud)[https://nextcloud.sokutan.de/s/CCeWBg8jtNqiDJf]
+Short drafts and a demo video can be found under my [nextcloud](https://nextcloud.sokutan.de/s/CCeWBg8jtNqiDJf).
 
 ## Questions?
-For any questions or clarifications, feel free to reach out to (s.okutan@tum.de)[s.okutan@tum.de].
+For any questions or clarifications, feel free to reach out to [s.okutan@tum.de](s.okutan@tum.de).
 
 Thank you for the opportunity, and I look forward to your feedback! 😊
