@@ -22,7 +22,7 @@ function UseConversationMessagePag(sizeProp: number) {
     useEffect(() => {
         const interval = setInterval(async () => {
             if (selectedConversation !== null) {
-                const response = await messageApi.getConversationMessagePagConversationConversationIdMessageGet(selectedConversation.conversation_id, page, size);
+                const response = await messageApi.getConversationMessagePagConversationConversationIdMessageGet(selectedConversation.conversation_id, 1, size * page);
                 if (response.status === 200) {
                     if (messages && messages.length > 0 && response.data[0].message_id !== messages[0].message_id) {
                         setMessages(response.data);

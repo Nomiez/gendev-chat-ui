@@ -27,7 +27,7 @@ function ReviewDialog(props: { reviewAPI: ReviewApi, conversation_id: number, ot
                         <label className="Label" htmlFor="review">
                             Review
                         </label>
-                        <input ref={ref} className="Input" id="review" defaultValue="@peduarte"/>
+                        <input ref={ref} className="Input" id="review"/>
                     </fieldset>
                     <div style={{display: 'flex', marginTop: 25, justifyContent: 'flex-end'}}>
                         <Dialog.Close asChild>
