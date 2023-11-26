@@ -50,7 +50,7 @@ jobs:
           export ACCESS_TOKEN_EXPIRE_MINUTES=1000
           export SKIP_DB_CONNECTION=True
           python server/extract-openapi.py app.main:app
-          mv server/openapi.yaml client/openapi_generated.yaml
+          mv openapi.yaml client/openapi.yaml
 
       - name: Build and push
         uses: docker/build-push-action@v3

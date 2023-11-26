@@ -44,7 +44,7 @@ jobs:
           export SKIP_DB_CONNECTION=True
           
           python server/extract-openapi.py app.main:app
-          mv server/openapi.yaml client/openapi_generated.yaml
+          mv openapi.yaml client/openapi.yaml
 
       - name: Use Node.js 20.x
         uses: actions/setup-node@v3
