@@ -55,7 +55,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          working-directory: ./client
-          context: .
+          context: './client'
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ghcr.io/${{ github.repository }}:preview

@@ -49,24 +49,23 @@ jobs:
       - name: Use Node.js 20.x
         uses: actions/setup-node@v3
         with:
-          working-directory: ./client
           node-version: 20.x
 
       - name: Run install
         uses: borales/actions-yarn@v4
         with:
-          working-directory: ./client
+          dir: 'client'
           cmd: install --frozen-lockfile # will run `yarn install` command
 
       - name: Build production bundle
         uses: borales/actions-yarn@v4
         with:
-          working-directory: ./client
+          dir: 'client'
           cmd: build # will run `yarn build:prod` command
 
       - name: Upload aritfacts
         uses: actions/upload-artifact@v3
         with:
-          working-directory: ./client
+          dir: 'client'
           name: build
           path: build
