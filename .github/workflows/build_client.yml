@@ -33,7 +33,16 @@ jobs:
 
       - name: Extract OpenAPI spec
         run: |
+          export DATABASE_HOSTNAME=localhost
+          export DATABASE_PORT=5432
+          export DATABASE_PASSWORD=tmp
+          export DATABASE_NAME=tmp
+          export DATABASE_USERNAME=tmp
+          export SECRET_KEY=1
+          export ALGORITHM=HS256
+          export ACCESS_TOKEN_EXPIRE_MINUTES=1000
           export SKIP_DB_CONNECTION=True
+          
           python server/extract-openapi.py app.main:app
           mv server/openapi.yaml client/openapi_generated.yaml
 
