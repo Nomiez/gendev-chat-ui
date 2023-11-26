@@ -43,6 +43,7 @@ jobs:
 
       - name: Extract OpenAPI spec
         run: |
+          export SKIP_DB_CONNECTION=True
           python server/extract-openapi.py app.main:app
           mv server/openapi.yaml client/openapi_generated.yaml
 
