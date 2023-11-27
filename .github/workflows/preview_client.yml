@@ -64,9 +64,13 @@ jobs:
           dir: 'client'
           cmd: generateAPI
 
+      - name: Downcase REPO
+        run: |
+          echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
           context: './client'
           push: ${{ github.ref == 'refs/heads/main' }}
-          tags: ghcr.io/${GITHUB_REPOSITORY,,}:preview
+          tags: ghcr.io/${{env.REPO}}:preview
