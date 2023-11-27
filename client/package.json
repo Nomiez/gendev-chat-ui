@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "generateAPI": "rimraf src/api && openapi-generator-cli generate -i ../server/openapi.yaml --additional-properties=supportsES6=true,withSeparateModelsAndApi=true,apiPackage=apis,modelPackage=models -g typescript-axios -o ./src/api",
+    "generateAPI": "rimraf src/api && openapi-generator-cli generate -i ./openapi.yaml --additional-properties=supportsES6=true,withSeparateModelsAndApi=true,apiPackage=apis,modelPackage=models -g typescript-axios -o ./src/api",
     "clean": "rimraf dist"
   },
   "dependencies": {

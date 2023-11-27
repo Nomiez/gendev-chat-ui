@@ -1,3 +1,6 @@
+import argparse
+import os
+
 from fastapi import FastAPI
 
 from app.routes import user_route, token_route, review_route, conversation_route, conversation_message_route, \
@@ -14,14 +17,16 @@ from app.models import (
     users, thread_messages
 )
 
-conversations.Base.metadata.create_all(bind=engine)
-keywords.Base.metadata.create_all(bind=engine)
-likes.Base.metadata.create_all(bind=engine)
-conversation_messages.Base.metadata.create_all(bind=engine)
-thread_messages.Base.metadata.create_all(bind=engine)
-reviews.Base.metadata.create_all(bind=engine)
-uk_links.Base.metadata.create_all(bind=engine)
-users.Base.metadata.create_all(bind=engine)
+# Is used for generating the openapi.json file
+if not os.environ.get('SKIP_DB_CONNECTION', False):
+    conversations.Base.metadata.create_all(bind=engine)
+    keywords.Base.metadata.create_all(bind=engine)
+    likes.Base.metadata.create_all(bind=engine)
+    conversation_messages.Base.metadata.create_all(bind=engine)
+    thread_messages.Base.metadata.create_all(bind=engine)
+    reviews.Base.metadata.create_all(bind=engine)
+    uk_links.Base.metadata.create_all(bind=engine)
+    users.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
