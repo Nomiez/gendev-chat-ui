@@ -1,4 +1,4 @@
-name: "Build release for client"
+name: "Build release for server"
 
 on:
   push:
