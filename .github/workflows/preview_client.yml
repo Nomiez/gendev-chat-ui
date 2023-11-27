@@ -1,0 +1,76 @@
+name: "Build and push preview docker image for client"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  docker:
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Login to GitHub container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r server/requirements.txt
+
+      - name: Extract OpenAPI spec
+        run: |
+          export DATABASE_HOSTNAME=localhost
+          export DATABASE_PORT=5432
+          export DATABASE_PASSWORD=tmp
+          export DATABASE_NAME=tmp
+          export DATABASE_USERNAME=tmp
+          export SECRET_KEY=1
+          export ALGORITHM=HS256
+          export ACCESS_TOKEN_EXPIRE_MINUTES=1000
+          export SKIP_DB_CONNECTION=True
+          python server/extract-openapi.py app.main:app
+          mv openapi.yaml client/openapi.yaml
+
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          dir: 'client'
+          cmd: install --frozen-lockfile # will run `yarn install` command
+
+      - name: Build api
+        uses: borales/actions-yarn@v4
+        with:
+          dir: 'client'
+          cmd: generateAPI
+
+      - name: Downcase REPO
+        run: |
+          echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: './client'
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ghcr.io/${{env.REPO}}/client:preview

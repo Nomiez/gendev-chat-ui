@@ -1,8 +1,6 @@
 import re
 from datetime import datetime
 
-import phonenumbers
-
 from app.models.conversation_messages import SenderType
 from app.models.conversations import State
 from app.schemas.conversation_schema import ConversationSchema
@@ -12,14 +10,6 @@ from app.schemas.message_schema import ConversationMessage
 class MessageStream:
     def __init__(self, elements: list[ConversationMessage]):
         self.elements = elements
-
-    @staticmethod
-    def _extract_phone_numbers(text):
-        numbers = []
-        for match in phonenumbers.PhoneNumberMatcher(text, None):
-            numbers.append(phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164))
-        print(numbers)
-        return numbers
 
     @staticmethod
     def _censor_phone_numbers(text):
