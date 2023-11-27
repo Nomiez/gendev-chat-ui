@@ -55,6 +55,18 @@ jobs:
           python server/extract-openapi.py app.main:app
           mv openapi.yaml client/openapi.yaml
 
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          dir: 'client'
+          cmd: install --frozen-lockfile # will run `yarn install` command
+
+      - name: Build api
+        uses: borales/actions-yarn@v4
+        with:
+          dir: 'client'
+          cmd: generateAPI
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:

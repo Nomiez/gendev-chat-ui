@@ -57,6 +57,12 @@ jobs:
           dir: 'client'
           cmd: install --frozen-lockfile # will run `yarn install` command
 
+      - name: Build api
+        uses: borales/actions-yarn@v4
+        with:
+          dir: 'client'
+          cmd: generateAPI
+
       - name: Build production bundle
         uses: borales/actions-yarn@v4
         with:
