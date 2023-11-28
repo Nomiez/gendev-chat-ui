@@ -60,10 +60,14 @@ function UseConversationPag(sizeProp: number) {
             const response = await conversationApi.getConversationsPagConversationGet(1, page * size);
             if (response.status === 200) {
                 let update = false;
-                for (let i = 0; i < response.data.length; i++) {
-                    if (conversations[i] && response.data[i].last_message?.message_id !== conversations[i].last_message?.message_id) {
-                        update = true;
-                        break;
+                if (response.data.length !== conversations.length) {
+                    update = true;
+                } else {
+                    for (let i = 0; i < response.data.length; i++) {
+                        if (conversations[i] && response.data[i].last_message?.message_id !== conversations[i].last_message?.message_id) {
+                            update = true;
+                            break;
+                        }
                     }
                 }
                 if (update) {

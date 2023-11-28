@@ -8,6 +8,7 @@ from app.schemas.conversation_schema import ConversationGet, ConversationPost, C
 from app.schemas.message_schema import ReadingState
 from app.services.conversation_message_service import update_sending_status_by_conversation_id
 from app.utils.message_stream import MessageStream
+from app.utils.stream_handles import stream_handles as handles
 
 
 def _update_conversation_reading_state(conversation: ConversationSchema, user_id: int) -> None:
@@ -62,7 +63,14 @@ def create_conversation(conversation: ConversationPost, user_id: int) -> Convers
     if conversation.customer_id == conversation.service_provider_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Customer and service provider must be different")
-    return conversation_repository.create_conversation(conversation, user_id)
+    conversation = conversation_repository.create_conversation(conversation, user_id)
+    dict_message = {
+        "conversation_id": conversation.conversation_id
+    }
+    handles.enqueue_message_opt([user_id, (conversation.customer_id
+                                           if conversation.customer_id is not user_id
+                                           else conversation.service_provider_id)], str(dict_message))
+    return conversation
 
 
 def delete_conversation(conversation_id: int) -> None:
