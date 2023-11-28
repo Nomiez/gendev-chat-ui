@@ -1,6 +1,7 @@
 import {useContext, useEffect} from "preact/compat";
 import context from "../utils/Context.tsx";
 import {useState} from "react";
+import useSSE from "./UseSSE.tsx";
 
 function UseConversationPag(sizeProp: number) {
 
@@ -17,34 +18,14 @@ function UseConversationPag(sizeProp: number) {
         selectedConversation
     } = useContext(context);
 
-    // Fetch conversations every 1 seconds
-    // TODO: Use SSE instead
-    useEffect(() => {
-        const interval = setInterval(async () => {
-            const response = await conversationApi.getConversationsPagConversationGet(1, page * size);
-            if (response.status === 200) {
-                let update = false;
-                for (let i = 0; i < response.data.length; i++) {
-                    if (conversations[i] && response.data[i].last_message?.message_id !== conversations[i].last_message?.message_id) {
-                        update = true;
-                        break;
-                    }
-                }
-                if (update) {
-                    setConversations(response.data);
-                    console.log("TEST")
-                }
-                const newSelectedConversation = conversations.filter((conversation) => conversation.conversation_id === selectedConversation?.conversation_id)[0];
-                if (newSelectedConversation && newSelectedConversation.last_message?.message_id !== selectedConversation?.last_message?.message_id) {
-                    setSelectedConversation(newSelectedConversation);
-                }
-            }
-        }, 1000);
-        return () => clearInterval(interval);
-
-    }, [conversationApi, selectedConversation, conversations, page, size])
+    const {
+        data,
+        connect,
+        close
+    } = useSSE();
 
 
+    // Fetch initial conversations
     useEffect(() => {
         const loadConversations = async (page: number, size: number) => {
             const response = await conversationApi.getConversationsPagConversationGet(page, size);
@@ -68,9 +49,42 @@ function UseConversationPag(sizeProp: number) {
             setSize(prev => prev)
         }
         asyncWrapper();
-
+        connect();
+        return () => {
+            close();
+        }
     }, [conversationApi])
 
+    useEffect(() => {
+        const wrapper = async () => {
+            const response = await conversationApi.getConversationsPagConversationGet(1, page * size);
+            if (response.status === 200) {
+                let update = false;
+                for (let i = 0; i < response.data.length; i++) {
+                    if (conversations[i] && response.data[i].last_message?.message_id !== conversations[i].last_message?.message_id) {
+                        update = true;
+                        break;
+                    }
+                }
+                if (update) {
+                    setConversations(response.data);
+                }
+                const newSelectedConversation = conversations.filter((conversation) => conversation.conversation_id === selectedConversation?.conversation_id)[0];
+                if (newSelectedConversation && newSelectedConversation.last_message?.message_id !== selectedConversation?.last_message?.message_id) {
+                    setSelectedConversation(newSelectedConversation);
+                }
+                setPage(1);
+                setSize(size * page);
+            }
+        }
+        if (data) {
+            wrapper();
+        }
+
+    }, [data])
+
+
+    // Fetch new conversations when scrolling to the bottom
     useEffect(() => {
         if (offset) {
             const loadConversations = async (page: number, size: number) => {

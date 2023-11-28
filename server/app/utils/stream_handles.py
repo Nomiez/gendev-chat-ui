@@ -25,10 +25,11 @@ class StreamHandles:
     def is_handle_ready(self, user_id: int, stream_uuid: UUID) -> bool:
         return self._get_handle(user_id, stream_uuid).empty()
 
-    def enqueue_message_opt(self, user_id: int, message: str):
-        if user_id in self._handles:
-            for stream in self._handles.get(user_id).values():
-                stream.put_nowait(message)
+    def enqueue_message_opt(self, user_ids: list[int], message: str):
+        for user_id in user_ids:
+            if user_id in self._handles:
+                for stream in self._handles.get(user_id).values():
+                    stream.put_nowait(message)
 
     def dequeue_message(self, user_id: int, stream_uuid: UUID):
         return self._get_handle(user_id, stream_uuid).get_nowait()
