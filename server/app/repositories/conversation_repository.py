@@ -53,7 +53,7 @@ class ConversationRepository:
                                service_provider=new_conversation.service_provider,
                                last_message=None,
                                unread_messages=conversation_message_repository.get_number_of_unread_messages(
-                                   conversation.conversation_id, user_id))
+                                   new_conversation.conversation_id, user_id))
 
     def delete_conversation(self, conversation_id: int) -> None:
         conversation = self.db.query(Conversation).filter(Conversation.conversation_id == conversation_id).first()
