@@ -198,11 +198,14 @@ def update_sending_status_by_conversation_id(conversation_id: int,
                                              receiver_id: int,
                                              sender_id: int,
                                              state: ReadingState) -> None:
-    last_message = conversation_message_repository.get_messages_by_conversation_id_pag(conversation_id, 1, 1)
-    if last_message is not [] and last_message[0].read_at is not None:
-        return
+    last_message1 = conversation_message_repository.get_messages_by_conversation_id_pag(conversation_id, 1, 1)
     conversation_message_repository.update_reading_state_for_conversation(conversation_id, receiver_id, state)
-    handles.enqueue_message_opt([sender_id], str({"conversation_id": conversation_id}))
+    last_message2 = conversation_message_repository.get_messages_by_conversation_id_pag(conversation_id, 1, 1)
+    if len(last_message1) > 0 \
+            and len(last_message2) > 0 \
+            and last_message1[0].received_at != last_message2[0].received_at \
+            and last_message1[0].read_at != last_message2[0].read_at:
+        handles.enqueue_message_opt([sender_id], str({"conversation_id": conversation_id}))
 
 
 def get_message_by_message_id(message_id: int, conversation_id: int, user_id: int,
@@ -262,7 +265,7 @@ def update_message_reactions(conversation_id: int, message_id, user_id: int, rea
     result = conversation_message_repository.update_conversation_message(msg.message_id,
                                                                          ConversationMessagePut(**msg.model_dump()))
     conversation_repository.update_last_update_of_conversation(conversation_id)
-    # handles.enqueue_message_opt([user_id], str({"conversation_id": conversation_id}))
+    handles.enqueue_message_opt([user_id], str({"conversation_id": conversation_id}))
     return result
 
 
