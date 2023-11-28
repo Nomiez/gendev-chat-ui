@@ -88,7 +88,7 @@ function ChatBox(props: ChatProps) {
                         alignItems: "center"
                     }}>
                         <Text size={"3"} weight={"bold"}>{`${other_user.first_name} ${other_user.last_name}`}</Text>
-                        {conversation.unread_messages > 0 &&
+                        {conversation.unread_messages > 0 && conversation.conversation_id !== selectedConversationId &&
                             <div style={{
                                 borderRadius: "10px",
                                 height: "15px",
@@ -111,8 +111,8 @@ function ChatBox(props: ChatProps) {
                         maxWidth: "100%"
                     }}>
                         <Text size={"1"}
-                              color={conversation.unread_messages > 0 ? "white" : "gray"}
-                              weight={conversation.unread_messages > 0 ? "bold" : "normal"}
+                              color={conversation.unread_messages > 0 && conversation.conversation_id !== selectedConversationId ? "white" : "gray"}
+                              weight={conversation.unread_messages > 0 && conversation.conversation_id !== selectedConversationId ? "bold" : "normal"}
                               style={{
                                   whiteSpace: "nowrap",
                                   overflow: "hidden",
@@ -122,8 +122,8 @@ function ChatBox(props: ChatProps) {
                         >{conversation.last_message?.text ?? "System: Ihr Auftrag wurde zugestellt"}</Text>
 
                         <Text size={"1"}
-                              color={conversation.unread_messages > 0 ? "white" : "gray"}
-                              weight={conversation.unread_messages > 0 ? "bold" : "normal"}
+                              color={conversation.unread_messages > 0 && conversation.conversation_id !== selectedConversationId ? "white" : "gray"}
+                              weight={conversation.unread_messages > 0 && conversation.conversation_id !== selectedConversationId ? "bold" : "normal"}
                               style={{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}
                         >{formatTime(new Date(conversation.last_message?.created_at as string))}</Text>
                     </div>

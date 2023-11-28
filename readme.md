@@ -36,11 +36,11 @@ Frontend: React.js (Vite) for a responsive and dynamic UI.
 
 ✅ Thumbnail processing (to improve UX)
 
-📚 Live-Updates (Socket/Polling/...) - (in my case SSE)
+✅ Live-Updates (Socket/Polling/...) - (in my case SSE)
 
 ❌ Start the conversation at the scroll offset of the first unread message
 
-❌ Dockerize your system so that anyone can run it on their machine
+✅ Dockerize your system so that anyone can run it on their machine
 
 ✅ OpenAPI for backend <-> frontend communication (+ code generation)
 
@@ -58,7 +58,7 @@ Frontend: React.js (Vite) for a responsive and dynamic UI.
 ### Explanation
 ✅ Implemented in Client and Server
 
-📚 Only implemented in Client
+📚 Only implemented in Server
 
 ❌ Not implemented
 
@@ -75,11 +75,16 @@ Run
 ```
 python extract-openapi.py app.main:app
 ```
+Before installing the requirements, think about creating a virtual environment.
 ```
-pip install requirements.txt
+python -m venv venv
+```
+Activate the virtual environment. Afterwards, install the requirements and run the server.
+```
+pip install -r requirements.txt
 ```
 ```
-uvicorn app.main:app --reload --host 0.0.0.0 app
+uvicorn app.main:app --reload --host 0.0.0.0
 ```
 
 ### For the client

@@ -2,6 +2,7 @@ import {useContext, useEffect} from "preact/compat";
 import context from "../utils/Context.tsx";
 import {useState} from "react";
 import {ConversationMessage} from "../api";
+import useSSE from "./UseSSE.tsx";
 
 function UseConversationMessagePag(sizeProp: number) {
 
@@ -13,27 +14,14 @@ function UseConversationMessagePag(sizeProp: number) {
 
     const {
         selectedConversation,
-        messageApi
+        messageApi,
     } = useContext(context);
 
-
-    // Fetch conversations every 10 seconds
-    // TODO: Use SSE instead
-    useEffect(() => {
-        const interval = setInterval(async () => {
-            if (selectedConversation !== null) {
-                const response = await messageApi.getConversationMessagePagConversationConversationIdMessageGet(selectedConversation.conversation_id, 1, size * page);
-                if (response.status === 200) {
-                    if (messages && messages.length > 0 && response.data[0].message_id !== messages[0].message_id) {
-                        setMessages(response.data);
-                    }
-                }
-            }
-        }, 1000);
-        return () => clearInterval(interval);
-
-    }, [messageApi, selectedConversation, messages])
-
+    const {
+        data,
+        connect,
+        close
+    } = useSSE();
 
     useEffect(() => {
         const loadConversationMessages = async (page: number, size: number) => {
@@ -59,8 +47,34 @@ function UseConversationMessagePag(sizeProp: number) {
             setSize(sizeProp)
         }
         asyncWrapper();
-
+        connect();
+        return () => {
+            close();
+        }
     }, [selectedConversation])
+
+    useEffect(() => {
+        console.log("data: " + data)
+        const wrapper = async (data: any) => {
+            console.log(data);
+            if (selectedConversation !== null) {
+                const response = await messageApi.getConversationMessagePagConversationConversationIdMessageGet(selectedConversation.conversation_id, 1, size * page);
+                if (response.status === 200) {
+                    if (messages && messages.length > 0 && response.data[0].message_id !== messages[0].message_id) {
+                        setMessages(response.data);
+                        setPage(1);
+                        setSize(size * page);
+                    }
+                }
+            }
+        }
+
+        if (data) {
+            wrapper(data);
+        }
+
+    }, [data])
+
 
     useEffect(() => {
         console.log("offset: " + offset)
