@@ -64,7 +64,8 @@ function UseConversationPag(sizeProp: number) {
                     update = true;
                 } else {
                     for (let i = 0; i < response.data.length; i++) {
-                        if (conversations[i] && response.data[i].last_message?.message_id !== conversations[i].last_message?.message_id) {
+                        if (conversations[i] && response.data[i].last_message?.message_id !== conversations[i].last_message?.message_id
+                        || response.data[i].unread_messages !== conversations[i].unread_messages) {
                             update = true;
                             break;
                         }
@@ -85,7 +86,7 @@ function UseConversationPag(sizeProp: number) {
             wrapper();
         }
 
-    }, [data])
+    }, [data, selectedConversation])
 
 
     // Fetch new conversations when scrolling to the bottom
