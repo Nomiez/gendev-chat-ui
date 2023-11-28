@@ -63,15 +63,48 @@ Frontend: React.js (Vite) for a responsive and dynamic UI.
 ❌ Not implemented
 
 ## How to Run Locally
+
+### Via docker-compose
+You can run the application via docker-compose. 
+Therefore, you need access to the docker image of the server and client on ghcr.io.
+```
+docker login ghcr.io
+```
+Navigate to the project directory and export the following environment variables:
+```
+export POSTGRES_PASSWORD=...
+export SECRET_KEY=...
+export TOKEN_EXPIRE_MINUTES
+```
+After that you can run:
+```
+docker-compose up
+```
+
+### For development
 Clone the repository.
 Navigate to the project directory.
 
-### For the server
+#### For the server
 
 ❗️ Do this first if you do not have generated the client
 
-Navigate to '/server':
-Run
+Navigate to '/server' and export/put the following env variable in an .env file:
+```
+DATABASE_HOSTNAME=localhost
+DATABASE_PORT=5432
+DATABASE_PASSWORD=...
+DATABASE_NAME=gendev_db
+DATABASE_USERNAME=postgres
+SECRET_KEY=...
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=1000
+```
+If you have no running db you could also export the following env variable:
+```
+export SKIP_DB_CONNECTION=True
+```
+Afterwards, run the following command to generate the client:
 ```
 python extract-openapi.py app.main:app
 ```
@@ -87,10 +120,13 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0
 ```
 
-### For the client
+#### For the client
 
-Navigate to '/client':
-Run
+Navigate to '/client' and put the following env variable in an .env file:
+```
+VITE_PROXY_API_URL=http://0.0.0.0:8000
+```
+Afterwards, install the requirements and run the server.
 ```
 yarn install
 ```
