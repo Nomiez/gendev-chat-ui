@@ -13,7 +13,7 @@ export default ({mode}) => {
             proxy: {
                 // Proxy all requests to /<objectId>/api/... to http://localhost:8080/<objectId>/api/... (CORS)
                 '/api': {
-                    target: process.env.VITE_PROXY_API_URL || 'server:8080',
+                    target: process.env.VITE_PROXY_API_URL || 'http://server:8080',
                     changeOrigin: true,
                     rewrite: path => path.replace(/^\/api/, ''),
                 },
