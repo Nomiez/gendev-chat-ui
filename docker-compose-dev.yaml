@@ -15,7 +15,8 @@ services:
     networks:
       - gendev-network
   server:
-    image: "ghcr.io/nomiez/gendev-chat-ui/server:preview"
+    build:
+      context: ./server/
     container_name: gendev-server
     ports:
       - "8080:80"
@@ -32,8 +33,14 @@ services:
       ACCESS_TOKEN_EXPIRE_MINUTES: ${TOKEN_EXPIRE_MINUTES}
     networks:
       - gendev-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:80/docs" ]
+      interval: 30s
+      timeout: 2s
+      retries: 5
   client:
-    image: "ghcr.io/nomiez/gendev-chat-ui/client:preview"
+    build:
+      context: ./client/
     depends_on:
       server:
         condition: service_healthy
